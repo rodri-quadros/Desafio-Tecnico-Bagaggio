@@ -92,7 +92,7 @@ pytest
 
 ---
 
-📅 Linha do Tempo do Desenvolvimento
+# 📅 Linha do Tempo do Desenvolvimento
 
   📁 Estruturação do projeto com FastAPI 
   
@@ -114,7 +114,7 @@ pytest
 
 ---
 
-👨‍💻 Autor
+# 👨‍💻 Autor
 Rodrigo Quadros
 Estudante de Ciência da Computação – Universidade Veiga de Almeida
 Email: rodrigoquadros.dev@gmail.com
