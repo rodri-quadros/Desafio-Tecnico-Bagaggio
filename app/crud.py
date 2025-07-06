@@ -1,9 +1,21 @@
 from fastapi import HTTPException
 from typing import List
-from app.schemas.product import Produto, CriarProduto, AtualizarProduto
+from app.schemas.product import Produto
+from app.models.product import ProdutoModel
+from app.schemas.categoria import CriarCategoria
+from app.models.categoria import CategoriaModels
+from app.database import SessionLocal
+from sqlalchemy.orm import Session
 
 produtos = []
 contador_id = 1
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def gerar_id_automaticamente():
     global contador_id
@@ -14,55 +26,80 @@ def gerar_id_automaticamente():
 
 # endpoint GET /produtos
 def listar_produtos():
+    db = SessionLocal()
+    produtos = db.query(ProdutoModel).all()
+    db.close()
     if not produtos:
         return{"aviso": "Nenhum produto foi cadastrado ainda"}
     return produtos
     
 # endpoit GET /produtos{id}
 def id_produtos(id: int):
-    for p in produtos:  #################################################################################
-        if p.id == id:  # percorre por todos os produtos para checar se ele existe e retornar o id dele # 
-            return p    #################################################################################
-    raise HTTPException(status_code=404, detail="Produto não encontrado") # caso nao exista, sera exibido um erro
+    db = SessionLocal()
+    produto = db.query(ProdutoModel).filter(ProdutoModel.id == id).first()
+    db.close()
+    if produto is None:
+        raise HTTPException(status_code=404, detail="Produto não encontrado") # caso nao exista, sera exibido um erro
+    return produto
 
 # endpoint POST /produtos
-def criar_produto(produto: CriarProduto):
-    novo_id = gerar_id_automaticamente()
-    for i in produtos:
-        if i.nome == produto.nome:
-            raise HTTPException(status_code=409, detail=f"Produto: {produto.id} duplicado")
-    novo_produto = Produto(
-        id=novo_id,
+def criar_produto(produto: Produto):
+    db = SessionLocal()
+    produto_existente = db.query(ProdutoModel).filter(ProdutoModel.nome == produto.nome).first()
+    if produto_existente:
+        db.close()
+        raise HTTPException(status_code=409, detail=f"Produto com nome '{produto.nome}' já existe na base")
+    novo_produto = ProdutoModel(
         nome=produto.nome,
         descricao=produto.descricao,
         preco=produto.preco,
         quantidade=produto.quantidade
     )
-    produtos.append(novo_produto)
+    db.add(novo_produto)
+    db.commit()
+    db.refresh(novo_produto)
+    db.close()
     return novo_produto
             
 # endpoint PUT /produtos/{id}
-def atualizar_produtos(id: int, produto_atualizado: AtualizarProduto):
-    for i in produtos:
-        if i.id == id:
-            if produto_atualizado.nome is not None:
-                i.nome = produto_atualizado.nome
-            if produto_atualizado.descricao is not None:
-                i.descricao = produto_atualizado.descricao
-            if produto_atualizado.preco is not None:
-                i.preco = produto_atualizado.preco
-            if produto_atualizado.quantidade is not None:
-                i.quantidade = produto_atualizado.quantidade
-            return i
-    raise HTTPException(status_code=404, detail=f"{id} não encontrado")
+def atualizar_produtos(id: int, produto_atualizado: Produto):
+    db = SessionLocal()
+    produto = db.query(ProdutoModel).filter(ProdutoModel.id == id).first()
+    if produto is None:
+        db.close()
+        raise HTTPException(status_code=404, detail=f"{id} não encontrado")
+    if produto_atualizado.nome is not None:
+        produto.nome = produto_atualizado.nome
+    if produto_atualizado.descricao is not None:
+        produto.descricao = produto_atualizado.descricao
+    if produto_atualizado.preco is not None:
+        produto.preco = produto_atualizado.preco
+    if produto_atualizado.quantidade is not None:
+        produto.quantidade = produto_atualizado.quantidade
+    db.commit()
+    db.refresh(produto)
+    db.close()
+    return produto
+    
         
 # endpoint DEL /produto/{id}
 def excluir_produto(id: int):
-    for i in produtos:
-        if i.id == id:
-            produtos.remove(i)
-            return {
-                "mensagem":f"Produto {id} removido",
-                "produtos": produtos
-                }
-    raise HTTPException(status_code=400, detail="Produto não encontrado")
+    db = SessionLocal()
+    produto = db.query(ProdutoModel).filter(ProdutoModel.id == id).first()
+    if produto is None:
+        db.close()
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    db.delete(produto)
+    db.commit()
+    db.close()
+    return {"detail":"Produto excluído com sucesso"}
+   
+def criar_categoria(db: Session, categoria: CriarCategoria):
+    nova_categoria = CategoriaModels(nome=categoria.nome)
+    db.add(nova_categoria)
+    db.commit()
+    db.refresh(nova_categoria)
+    return nova_categoria
+
+def listar_categorias(db: Session):
+    return db.query(CategoriaModels).all()
