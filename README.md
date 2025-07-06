@@ -92,6 +92,15 @@ pytest
 
 ---
 
+## 🌍 Deploy em produção
+
+A aplicação foi publicada gratuitamente via [Railway](https://railway.app):
+
+🔗 Acesse o Swagger UI: (https://desafio-tecnico-bagaggio-production.up.railway.app/docs)  
+🔗 Acesse a Redoc: (https://desafio-tecnico-bagaggio-production.up.railway.app/redoc)
+
+---
+
 # 📅 Linha do Tempo do Desenvolvimento
 
   📁 Estruturação do projeto com FastAPI 
@@ -107,6 +116,8 @@ pytest
   🧪 Criação e validação dos testes automatizados
   
   🐳 Conteinerização com Docker (Dockerfile + Compose) 
+
+  🌍 Deploy simulando ambiente de produção
   
   📚 Comentários explicativos e organização por boas práticas 
   
