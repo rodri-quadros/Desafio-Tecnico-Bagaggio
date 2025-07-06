@@ -64,7 +64,7 @@ A aplicação foi estruturada com separação clara entre camadas:
 
 ### 1. Clonar o repositório
 ```bash
-git clone [https://github.com/rodri-quadros/desafio_bagaggio.git](https://github.com/rodri-quadros/Desafio-Tecnico-Bagaggio.git)
+git clone (https://github.com/rodri-quadros/Desafio-Tecnico-Bagaggio.git)
 cd Desafio-Tecnico-Bagaggio
 ```
 ### 2. Build da imagem Docker
