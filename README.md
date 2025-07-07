@@ -128,5 +128,5 @@ A aplicação foi publicada gratuitamente via [Railway](https://railway.app):
 # 👨‍💻 Autor
 Rodrigo Quadros
 Estudante de Ciência da Computação – Universidade Veiga de Almeida
-Email: rodrigoquadros.dev@gmail.com
+Email: rodrigonvquadros@gmail.com
 
